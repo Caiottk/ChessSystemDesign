@@ -1,6 +1,6 @@
 package boardgame;
 
-public class Piece {
+public abstract class Piece {
 	
 	protected Position position;
 	private Board board;
@@ -10,12 +10,25 @@ public class Piece {
 		position = null ;
 	}
 
-	protected Board getBoard() { //somente classes dentro do mesmo pacote e subclasses
-								 //vão acessar o tabuleiro de uma peça
+	protected Board getBoard(){
 		return board;
 	}
 	
-	
-	
+	public abstract boolean[][] possibleMoves();
 
+	public boolean possibleMove(Position position) {
+		return possibleMoves()[position.getRow()][position.getColumn()];
+	}
+
+	public boolean isThereAnyPossibleMove() {
+		boolean[][] mat = possibleMoves();
+		for(int i=0; i<mat.length; i++) {
+			for(int j=0; j<mat.length; j++) {
+				if(mat[i][j]) { // se tiver pelo menos um movimento possivel
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }

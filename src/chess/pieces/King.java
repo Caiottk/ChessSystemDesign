@@ -24,6 +24,11 @@ public class King extends ChessPiece {
         return p == null || p.getColor() != getColor(); // se a peça for nula ou a cor for diferente
     }
 
+    private boolean testRookCastling(Position position) {
+        ChessPiece p = (ChessPiece)getBoard().piece(position); // pega a peça na posição
+        return p != null && p instanceof Rook && p.getColor() == getColor() && p.getMoveCount() == 0; // se a peça for nula ou a cor for diferente
+    }
+
     @Override
     public boolean[][] possibleMoves() {
         boolean [][] mat = new boolean[getBoard().getRows()][getBoard().getColumns()];
@@ -76,6 +81,29 @@ public class King extends ChessPiece {
         p.setValues(position.getRow() + 1, position.getColumn() + 1);
         if(getBoard().positionExists(p) && canMove(p)) {
             mat[p.getRow()][p.getColumn()] = true; // pode mover
+        }
+
+        // #specialmove castling
+        if( getMoveCount() == 0 && !chessMatch.getCheck() ) {
+            // #specialmove castling kingside rook
+            Position posT1 = new Position(position.getRow(), position.getColumn() + 3); // posição da torre
+            if( testRookCastling(posT1) ) { // se a torre pode fazer o roque
+                Position p1 = new Position(position.getRow(), position.getColumn() + 1); // posição entre o rei e a torre
+                Position p2 = new Position(position.getRow(), position.getColumn() + 2); // posição entre o rei e a torre
+                if( getBoard().piece(p1) == null && getBoard().piece(p2) == null ) { // se as posições entre o rei e a torre estiverem vazias
+                    mat[position.getRow()][position.getColumn() + 2] = true; // pode mover
+                }
+            }
+            // #specialmove castling queenside rook
+            Position posT2 = new Position(position.getRow(), position.getColumn() - 4); // posição da torre
+            if( testRookCastling(posT2) ) { // se a torre pode fazer o roque
+                Position p1 = new Position(position.getRow(), position.getColumn() - 1); // posição entre o rei e a torre
+                Position p2 = new Position(position.getRow(), position.getColumn() - 2); // posição entre o rei e a torre
+                Position p3 = new Position(position.getRow(), position.getColumn() - 3); // posição entre o rei e a torre
+                if( getBoard().piece(p1) == null && getBoard().piece(p2) == null && getBoard().piece(p3) == null ) { // se as posições entre o rei e a torre estiverem vazias
+                    mat[position.getRow()][position.getColumn() - 2] = true; // pode mover
+                }
+            }
         }
 
         return mat;
